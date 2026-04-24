@@ -130,9 +130,19 @@ export default function ActivityTab({ analysis }: { analysis: RepoAnalysisData }
       )}
 
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center py-20 gap-4">
-          <Loader2 className="w-8 h-8 animate-spin text-gh-blue" />
-          <p className="text-gh-text-secondary text-sm">Fetching activity data...</p>
+        <div className="bg-gh-bg border border-gh-border rounded-lg overflow-hidden animate-pulse">
+          <div className="bg-gh-bg-secondary border-b border-gh-border px-4 py-3 h-12 w-full flex items-center">
+            <div className="h-4 bg-[#30363d] rounded w-40"></div>
+          </div>
+          <div className="p-6 h-[300px] sm:h-[400px] w-full flex items-end justify-between gap-2 md:gap-4">
+            {Array.from({ length: 15 }).map((_, i) => (
+              <div 
+                key={i} 
+                className="bg-[#30363d] w-full rounded-t-sm" 
+                style={{ height: `${Math.max(20, Math.random() * 80)}%` }}
+              ></div>
+            ))}
+          </div>
         </div>
       ) : isError ? (
         <div className="flex items-center justify-center py-20 text-gh-red">

@@ -30,10 +30,47 @@ export default function Dashboard({ repo }: { repo: string }) {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center flex-1 w-full py-20 gap-4">
-        <Loader2 className="w-12 h-12 animate-spin text-gh-blue" />
-        <p className="text-gh-text-secondary text-lg">Analyzing {repo}...</p>
-        <p className="text-gh-text-muted text-sm">This may take a few seconds.</p>
+      <div className="w-full flex flex-col items-center animate-pulse">
+        {/* Skeleton Info Bar */}
+        <div className="w-full bg-gh-bg border-b border-gh-border py-6 px-4">
+          <div className="w-full max-w-[1200px] mx-auto flex flex-col gap-3">
+            <div className="h-8 bg-[#30363d] rounded w-64"></div>
+            <div className="h-4 bg-[#30363d] rounded w-full max-w-2xl mt-2"></div>
+            <div className="h-4 bg-[#30363d] rounded w-3/4 max-w-xl"></div>
+            <div className="flex gap-4 mt-4">
+              <div className="h-5 bg-[#30363d] rounded w-20"></div>
+              <div className="h-5 bg-[#30363d] rounded w-20"></div>
+              <div className="h-5 bg-[#30363d] rounded w-24"></div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Skeleton Tabs */}
+        <div className="w-full border-b border-gh-border">
+           <div className="w-full max-w-[1200px] mx-auto flex gap-6 px-4 pt-4 pb-0">
+             <div className="h-8 bg-[#30363d] rounded-t-md w-20"></div>
+             <div className="h-8 bg-[#30363d] rounded-t-md w-24"></div>
+             <div className="h-8 bg-[#30363d] rounded-t-md w-28"></div>
+             <div className="h-8 bg-[#30363d] rounded-t-md w-28"></div>
+           </div>
+        </div>
+        
+        {/* Skeleton Content Grid */}
+        <div className="w-full max-w-[1200px] px-4 py-6 flex flex-col gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-gh-bg-secondary border border-gh-border rounded-lg h-24"></div>
+            <div className="bg-gh-bg-secondary border border-gh-border rounded-lg h-24"></div>
+            <div className="bg-gh-bg-secondary border border-gh-border rounded-lg h-24"></div>
+            <div className="bg-gh-bg-secondary border border-gh-border rounded-lg h-24"></div>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 bg-gh-bg border border-gh-border rounded-lg h-[400px]"></div>
+            <div className="flex flex-col gap-6">
+               <div className="bg-gh-bg border border-gh-border rounded-lg h-[250px]"></div>
+               <div className="bg-gh-bg border border-gh-border rounded-lg h-[150px]"></div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -58,7 +95,7 @@ export default function Dashboard({ repo }: { repo: string }) {
 
   return (
     <div className="w-full flex flex-col items-center">
-      <RepoInfoBar metadata={analysis.metadata} />
+      <RepoInfoBar analysis={analysis} />
       <Tabs activeTab={activeTab} onTabChange={setActiveTab} />
       
       <div className="w-full max-w-[1200px] px-4 py-6">
