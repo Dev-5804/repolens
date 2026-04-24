@@ -37,20 +37,25 @@ function HomeContent() {
               Instant, read-only dashboard for any public Git repository. 
               Search a repository to evaluate its health, activity, and quality.
             </p>
-            <form className="w-full relative mt-4" action={(formData) => {
-              const query = formData.get('query');
-              if (query) window.location.href = `/?repo=${encodeURIComponent(query as string)}`;
-            }}>
-              <input
-                type="text"
-                name="query"
-                placeholder="Enter repository URL or owner/repo..."
-                className="w-full bg-gh-bg-secondary border border-gh-border rounded-md px-4 py-3 focus:outline-none focus:border-gh-blue focus:ring-1 focus:ring-gh-blue text-lg placeholder:text-gh-text-muted"
-              />
-              <button type="submit" className="absolute right-2 top-2 bg-gh-green hover:bg-green-600 text-white px-4 py-1.5 rounded-md font-medium transition-colors">
-                Analyze
-              </button>
-            </form>
+            <div className="flex flex-col items-center gap-4 w-full mt-4">
+              <form className="w-full relative" action={(formData) => {
+                const query = formData.get('query');
+                if (query) window.location.href = `/?repo=${encodeURIComponent(query as string)}`;
+              }}>
+                <input
+                  type="text"
+                  name="query"
+                  placeholder="Enter repository URL or owner/repo..."
+                  className="w-full bg-gh-bg-secondary border border-gh-border rounded-md px-4 py-3 focus:outline-none focus:border-gh-blue focus:ring-1 focus:ring-gh-blue text-lg placeholder:text-gh-text-muted"
+                />
+                <button type="submit" className="absolute right-2 top-2 bg-gh-green hover:bg-green-600 text-white px-4 py-1.5 rounded-md font-medium transition-colors">
+                  Analyze
+                </button>
+              </form>
+              <a href="/compare" className="text-gh-blue hover:underline text-sm font-medium">
+                Want to benchmark? Compare two repositories instead &rarr;
+              </a>
+            </div>
           </div>
         ) : (
           <Dashboard repo={cleanRepo} />

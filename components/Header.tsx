@@ -1,8 +1,9 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { Search, GitCompare } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 function Github(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -36,10 +37,17 @@ export default function Header() {
   };
 
   return (
-    <header className="flex items-center gap-4 bg-gh-bg-secondary px-4 py-3 border-b border-gh-border text-gh-text text-sm w-full">
-      <div className="flex items-center gap-2 font-semibold hover:text-white cursor-pointer transition-colors" onClick={() => router.push('/')}>
-        <Github className="w-8 h-8" />
-        <span className="text-lg">Repolens</span>
+    <header className="flex items-center justify-between gap-4 bg-gh-bg-secondary px-4 py-3 border-b border-gh-border text-gh-text text-sm w-full">
+      <div className="flex items-center gap-6">
+        <div className="flex items-center gap-2 font-semibold hover:text-white cursor-pointer transition-colors" onClick={() => router.push('/')}>
+          <Github className="w-8 h-8" />
+          <span className="text-lg hidden sm:block">Repolens</span>
+        </div>
+        
+        <Link href="/compare" className="flex items-center gap-2 text-gh-text-secondary hover:text-white transition-colors font-medium">
+          <GitCompare className="w-4 h-4" />
+          <span className="hidden sm:block">Compare</span>
+        </Link>
       </div>
       <form onSubmit={handleSearch} className="flex-1 max-w-md ml-4 relative">
         <input
