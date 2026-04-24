@@ -1,65 +1,69 @@
-import Image from "next/image";
+"use client";
+
+import { useSearchParams } from 'next/navigation';
+import Header from '@/components/Header';
+import Dashboard from '@/components/Dashboard';
+import { Suspense } from 'react';
+
+function HomeContent() {
+  const searchParams = useSearchParams();
+  const repo = searchParams.get('repo');
+
+  // Helper to extract owner/repo from a URL if the user pastes a full github.com URL
+  const getCleanRepo = (input: string) => {
+    if (!input) return null;
+    let clean = input.trim();
+    if (clean.includes('github.com/')) {
+      clean = clean.split('github.com/')[1];
+    }
+    // Remove trailing slashes or extra paths
+    const parts = clean.split('/').filter(Boolean);
+    if (parts.length >= 2) {
+      return `${parts[0]}/${parts[1]}`;
+    }
+    return clean;
+  };
+
+  const cleanRepo = getCleanRepo(repo || "");
+
+  return (
+    <div className="min-h-screen flex flex-col w-full">
+      <Header />
+      <main className="flex-1 flex flex-col items-center w-full">
+        {!cleanRepo ? (
+          <div className="flex flex-col items-center justify-center flex-1 w-full max-w-2xl px-4 py-20 text-center gap-6">
+            <h1 className="text-5xl font-bold text-white tracking-tight">Repolens</h1>
+            <p className="text-gh-text-secondary text-lg">
+              Instant, read-only dashboard for any public Git repository. 
+              Search a repository to evaluate its health, activity, and quality.
+            </p>
+            <form className="w-full relative mt-4" action={(formData) => {
+              const query = formData.get('query');
+              if (query) window.location.href = `/?repo=${encodeURIComponent(query as string)}`;
+            }}>
+              <input
+                type="text"
+                name="query"
+                placeholder="Enter repository URL or owner/repo..."
+                className="w-full bg-gh-bg-secondary border border-gh-border rounded-md px-4 py-3 focus:outline-none focus:border-gh-blue focus:ring-1 focus:ring-gh-blue text-lg placeholder:text-gh-text-muted"
+              />
+              <button type="submit" className="absolute right-2 top-2 bg-gh-green hover:bg-green-600 text-white px-4 py-1.5 rounded-md font-medium transition-colors">
+                Analyze
+              </button>
+            </form>
+          </div>
+        ) : (
+          <Dashboard repo={cleanRepo} />
+        )}
+      </main>
+    </div>
+  );
+}
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
+      <HomeContent />
+    </Suspense>
   );
 }

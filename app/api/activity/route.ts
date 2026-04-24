@@ -1,0 +1,28 @@
+import { NextResponse } from 'next/server';
+import { getCommitsByDateRange } from '@/lib/github';
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const repo = searchParams.get('repo');
+  const since = searchParams.get('since') || '';
+  const until = searchParams.get('until') || '';
+
+  if (!repo || !repo.includes('/')) {
+    return NextResponse.json({ status: 'error', message: 'Invalid repository format' }, { status: 400 });
+  }
+
+  const [owner, repoName] = repo.split('/');
+
+  try {
+    const data = await getCommitsByDateRange(owner, repoName, since, until);
+    return NextResponse.json({ status: 'success', data });
+  } catch (error: any) {
+    if (error.message === 'REPO_NOT_FOUND') {
+      return NextResponse.json({ status: 'error', code: 'REPO_NOT_FOUND', message: 'Repository not found' }, { status: 404 });
+    }
+    if (error.message === 'RATE_LIMIT') {
+      return NextResponse.json({ status: 'error', code: 'RATE_LIMIT', message: 'API rate limit exceeded' }, { status: 403 });
+    }
+    return NextResponse.json({ status: 'error', message: 'Failed to fetch activity data' }, { status: 500 });
+  }
+}
