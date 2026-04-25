@@ -61,6 +61,13 @@ function HomeContent() {
           <Dashboard repo={cleanRepo} />
         )}
       </main>
+      <footer className="w-full border-t border-gh-border py-4 px-4 text-center text-xs text-gh-text-muted flex flex-col sm:flex-row items-center justify-center gap-3">
+        <span>© {new Date().getFullYear()} Repolens</span>
+        <span className="hidden sm:block text-gh-border">·</span>
+        <a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a>
+        <span className="hidden sm:block text-gh-border">·</span>
+        <a href="/terms" className="hover:text-white transition-colors">Terms of Service</a>
+      </footer>
     </div>
   );
 }
