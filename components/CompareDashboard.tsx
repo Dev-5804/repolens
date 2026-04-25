@@ -3,7 +3,7 @@
 import { useQueries } from '@tanstack/react-query';
 import { RepoAnalysisData } from '@/lib/types';
 import { useMemo } from 'react';
-import { AlertCircle, GitCommit, GitFork, Star, CircleDot, CheckCircle2, XCircle } from 'lucide-react';
+import { AlertCircle, GitFork, Star, CircleDot, CheckCircle2, XCircle } from 'lucide-react';
 import { 
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip as RechartsTooltip, CartesianGrid,
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
@@ -74,16 +74,15 @@ export default function CompareDashboard({ repo1, repo2 }: { repo1: string, repo
 
   const analysis1: RepoAnalysisData | undefined = results[0].data?.data;
   const analysis2: RepoAnalysisData | undefined = results[1].data?.data;
-  const activity1 = results[2].data?.data?.commits || [];
-  const activity2 = results[3].data?.data?.commits || [];
-
   const combinedActivityData = useMemo(() => {
+    const activity1 = results[2].data?.data?.commits || [];
+    const activity2 = results[3].data?.data?.commits || [];
     if (!activity1.length && !activity2.length) return [];
     const groups: Record<string, { name: string, repo1: number, repo2: number }> = {};
     
     // Helper to group by week
-    const processCommits = (commits: any[], repoKey: 'repo1' | 'repo2') => {
-      commits.forEach((c: any) => {
+    const processCommits = (commits: { date: string }[], repoKey: 'repo1' | 'repo2') => {
+      commits.forEach((c) => {
         const d = new Date(c.date);
         const day = d.getDay() || 7;
         d.setHours(-24 * (day - 1)); // Adjust to previous Monday
@@ -98,7 +97,7 @@ export default function CompareDashboard({ repo1, repo2 }: { repo1: string, repo
     processCommits(activity2, 'repo2');
 
     return Object.values(groups).sort((a, b) => a.name.localeCompare(b.name));
-  }, [activity1, activity2]);
+  }, [results]);
 
   if (isLoading) {
     return (
@@ -270,7 +269,7 @@ export default function CompareDashboard({ repo1, repo2 }: { repo1: string, repo
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <RechartsTooltip formatter={(value: number) => (value / 1024).toFixed(1) + ' KB'} contentStyle={{ backgroundColor: '#161b22', borderColor: '#30363d', color: '#c9d1d9', borderRadius: '6px' }} />
+                  <RechartsTooltip formatter={(value) => ((typeof value === 'number' ? value : Number(value ?? 0)) / 1024).toFixed(1) + ' KB'} contentStyle={{ backgroundColor: '#161b22', borderColor: '#30363d', color: '#c9d1d9', borderRadius: '6px' }} />
                 </PieChart>
               </ResponsiveContainer>
             ) : <div className="m-auto text-gh-text-muted">No language data</div>}
@@ -290,7 +289,7 @@ export default function CompareDashboard({ repo1, repo2 }: { repo1: string, repo
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <RechartsTooltip formatter={(value: number) => (value / 1024).toFixed(1) + ' KB'} contentStyle={{ backgroundColor: '#161b22', borderColor: '#30363d', color: '#c9d1d9', borderRadius: '6px' }} />
+                  <RechartsTooltip formatter={(value) => ((typeof value === 'number' ? value : Number(value ?? 0)) / 1024).toFixed(1) + ' KB'} contentStyle={{ backgroundColor: '#161b22', borderColor: '#30363d', color: '#c9d1d9', borderRadius: '6px' }} />
                 </PieChart>
               </ResponsiveContainer>
             ) : <div className="m-auto text-gh-text-muted">No language data</div>}

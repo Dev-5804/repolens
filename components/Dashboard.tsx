@@ -10,7 +10,7 @@ import ContributorsTab from './ContributorsTab';
 import CodeInsightsTab from './CodeInsightsTab';
 import ScoreTab from './ScoreTab';
 import { useState } from 'react';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 export default function Dashboard({ repo }: { repo: string }) {
   const [activeTab, setActiveTab] = useState('Overview');

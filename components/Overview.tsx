@@ -2,7 +2,7 @@ import { RepoAnalysisData } from '@/lib/types';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 
 export default function Overview({ analysis }: { analysis: RepoAnalysisData }) {
-  const { score, activity, contributors, languages, structure } = analysis;
+  const { score, activity, contributors, structure } = analysis;
 
   // Mock data for the chart, since we only have aggregated counts from the API.
   // In a real app with detailed commit histories, this would be a time series.

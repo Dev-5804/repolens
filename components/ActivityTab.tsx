@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { RepoAnalysisData } from '@/lib/types';
 import { useQuery } from '@tanstack/react-query';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
-import { Loader2, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 type DateRange = 'last30' | 'last90' | 'lastYear' | 'allTime' | 'custom';
 
@@ -36,7 +36,7 @@ export default function ActivityTab({ analysis }: { analysis: RepoAnalysisData }
     };
   }, [rangeType, customSince, customUntil]);
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['activity', repoFullName, since, until],
     queryFn: async () => {
       const token = localStorage.getItem('repolens_github_token') || '';
@@ -59,7 +59,7 @@ export default function ActivityTab({ analysis }: { analysis: RepoAnalysisData }
     const isLongRange = rangeType === 'lastYear' || rangeType === 'allTime' || rangeType === 'custom';
     const groups: Record<string, number> = {};
     
-    commits.forEach((c: any) => {
+    commits.forEach((c: { date: string }) => {
       const d = new Date(c.date);
       let key = '';
       if (isLongRange) {
@@ -142,7 +142,7 @@ export default function ActivityTab({ analysis }: { analysis: RepoAnalysisData }
               <div 
                 key={i} 
                 className="bg-[#30363d] w-full rounded-t-sm" 
-                style={{ height: `${Math.max(20, Math.random() * 80)}%` }}
+                style={{ height: `${[55, 30, 75, 45, 65, 20, 80, 35, 60, 50, 40, 70, 25, 55, 45][i]}%` }}
               ></div>
             ))}
           </div>

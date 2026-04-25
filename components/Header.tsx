@@ -32,10 +32,12 @@ export default function Header() {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("repolens_github_token");
-    if (!token) {
-      setIsTokenModalOpen(true);
-    }
+    // Use a timeout to defer the state update outside the synchronous effect body
+    const id = setTimeout(() => {
+      const token = localStorage.getItem("repolens_github_token");
+      if (!token) setIsTokenModalOpen(true);
+    }, 0);
+    return () => clearTimeout(id);
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {

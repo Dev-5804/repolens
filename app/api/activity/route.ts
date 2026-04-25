@@ -22,14 +22,15 @@ export async function GET(request: Request) {
   try {
     const data = await getCommitsByDateRange(owner, repoName, since, until, token);
     return NextResponse.json({ status: 'success', data });
-  } catch (error: any) {
-    if (error.message === 'UNAUTHORIZED') {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : '';
+    if (message === 'UNAUTHORIZED') {
       return NextResponse.json({ status: 'error', code: 'UNAUTHORIZED', message: 'Invalid or expired GitHub Token' }, { status: 401 });
     }
-    if (error.message === 'REPO_NOT_FOUND') {
+    if (message === 'REPO_NOT_FOUND') {
       return NextResponse.json({ status: 'error', code: 'REPO_NOT_FOUND', message: 'Repository not found' }, { status: 404 });
     }
-    if (error.message === 'RATE_LIMIT') {
+    if (message === 'RATE_LIMIT') {
       return NextResponse.json({ status: 'error', code: 'RATE_LIMIT', message: 'API rate limit exceeded' }, { status: 403 });
     }
     return NextResponse.json({ status: 'error', message: 'Failed to fetch activity data' }, { status: 500 });

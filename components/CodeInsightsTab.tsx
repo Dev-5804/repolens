@@ -27,12 +27,20 @@ const LANGUAGE_COLORS: Record<string, string> = {
 
 const DEFAULT_COLOR = '#8b949e';
 
+function StatusIcon({ status }: { status: boolean }) {
+  return status ? (
+    <CheckCircle2 className="w-5 h-5 text-gh-green" />
+  ) : (
+    <XCircle className="w-5 h-5 text-gh-red" />
+  );
+}
+
 export default function CodeInsightsTab({ analysis }: { analysis: RepoAnalysisData }) {
   const { languages, structure } = analysis;
 
   // Process language data for the chart
   const languageEntries = Object.entries(languages);
-  const totalBytes = languageEntries.reduce((sum, [_, bytes]) => sum + bytes, 0);
+  const totalBytes = languageEntries.reduce((sum, [, bytes]) => sum + bytes, 0);
   
   const chartData = languageEntries
     .map(([name, bytes]) => ({
@@ -42,14 +50,6 @@ export default function CodeInsightsTab({ analysis }: { analysis: RepoAnalysisDa
       color: LANGUAGE_COLORS[name] || DEFAULT_COLOR,
     }))
     .sort((a, b) => b.value - a.value);
-
-  const StatusIcon = ({ status }: { status: boolean }) => {
-    return status ? (
-      <CheckCircle2 className="w-5 h-5 text-gh-green" />
-    ) : (
-      <XCircle className="w-5 h-5 text-gh-red" />
-    );
-  };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -76,7 +76,13 @@ export default function CodeInsightsTab({ analysis }: { analysis: RepoAnalysisDa
                   ))}
                 </Pie>
                 <Tooltip 
-                  formatter={(value: number, name: string, props: any) => [`${props.payload.percentage}% (${(value / 1024).toFixed(1)} KB)`, name]}
+                  formatter={(value, name, item) => {
+                    const valueInKb = (typeof value === 'number' ? value : Number(value ?? 0)) / 1024;
+                    const percentage =
+                      typeof item?.payload?.percentage === 'string' ? item.payload.percentage : '0.0';
+
+                    return [`${percentage}% (${valueInKb.toFixed(1)} KB)`, String(name)];
+                  }}
                   contentStyle={{ backgroundColor: '#161b22', borderColor: '#30363d', color: '#c9d1d9', borderRadius: '6px' }}
                   itemStyle={{ color: '#fff' }}
                 />

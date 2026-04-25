@@ -36,7 +36,7 @@ export default function PrivacyPolicyPage() {
 
         <Section title="1. Overview">
           <p>
-            Repolens ("we", "us", or "our") is a read-only analytics tool for public GitHub repositories. This Privacy Policy explains what information we collect (or more importantly, what we <strong className="text-white">do not</strong> collect), and how your data is handled.
+            Repolens (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) is a read-only analytics tool for public GitHub repositories. This Privacy Policy explains what information we collect (or more importantly, what we <strong className="text-white">do not</strong> collect), and how your data is handled.
           </p>
           <p>
             We are committed to building a trustworthy product. Our goal is to be radically transparent about our data practices.
@@ -59,10 +59,10 @@ export default function PrivacyPolicyPage() {
             Repolens requires a GitHub Personal Access Token (PAT) to make API requests on your behalf. Here is exactly how it is handled:
           </p>
           <ul className="list-disc list-inside space-y-1 pl-2">
-            <li>Your token is stored <strong className="text-white">exclusively in your browser's localStorage</strong> on your own device.</li>
+            <li>Your token is stored <strong className="text-white">exclusively in your browser&apos;s localStorage</strong> on your own device.</li>
             <li>It is sent directly from your browser to the GitHub API on each request.</li>
             <li>It passes through our Next.js API route solely for the purpose of proxying the request to GitHub - it is <strong className="text-white">never logged or persisted</strong> on our servers.</li>
-            <li>You can delete your token at any time by clearing it from the settings (the 🔑 icon in the header) or by clearing your browser's local storage.</li>
+            <li>You can delete your token at any time by clearing it from the settings (the 🔑 icon in the header) or by clearing your browser&apos;s local storage.</li>
           </ul>
         </Section>
 
@@ -81,7 +81,7 @@ export default function PrivacyPolicyPage() {
             <li>
               <strong className="text-white">GitHub API</strong> - All repository data is sourced from the GitHub REST API. Your use of this service is governed by{" "}
               <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noreferrer" className="text-gh-blue hover:underline">
-                GitHub's Privacy Policy
+                GitHub&apos;s Privacy Policy
               </a>.
             </li>
           </ul>
@@ -95,7 +95,7 @@ export default function PrivacyPolicyPage() {
 
         <Section title="7. Changes to This Policy">
           <p>
-            We may update this Privacy Policy from time to time. We will indicate the "Last updated" date at the top of this page. Continued use of Repolens after any changes constitutes your acceptance of the revised policy.
+            We may update this Privacy Policy from time to time. We will indicate the &quot;Last updated&quot; date at the top of this page. Continued use of Repolens after any changes constitutes your acceptance of the revised policy.
           </p>
         </Section>
 

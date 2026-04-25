@@ -44,14 +44,15 @@ export async function GET(req: NextRequest) {
     let metadata;
     try {
       metadata = await getRepoMetadata(owner, repo, token);
-    } catch (err: any) {
-      if (err.message === 'UNAUTHORIZED') {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : '';
+      if (message === 'UNAUTHORIZED') {
          return NextResponse.json({ status: 'error', code: 'UNAUTHORIZED', message: 'Invalid or expired GitHub Token' } as ApiResponse, { status: 401 });
       }
-      if (err.message === 'REPO_NOT_FOUND') {
+      if (message === 'REPO_NOT_FOUND') {
          return NextResponse.json({ status: 'error', code: 'REPO_NOT_FOUND', message: 'Repository does not exist' } as ApiResponse, { status: 404 });
       }
-      if (err.message === 'RATE_LIMIT') {
+      if (message === 'RATE_LIMIT') {
          return NextResponse.json({ status: 'error', code: 'RATE_LIMIT', message: 'API rate limit exceeded' } as ApiResponse, { status: 429 });
       }
       throw err;
@@ -88,7 +89,7 @@ export async function GET(req: NextRequest) {
       data: analysisData
     } as ApiResponse);
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('API Error:', error);
     return NextResponse.json({
       status: 'error',

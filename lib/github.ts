@@ -63,8 +63,8 @@ export async function getCommitActivity(owner: string, repo: string, token: stri
   const data = await fetchGitHub(`/repos/${owner}/${repo}/commits?since=${date90DaysAgo.toISOString()}&per_page=100`, token);
   
   let commitsLast30Days = 0;
-  let commitsLast90Days = data.length || 0;
-  let lastCommitDate = data[0]?.commit?.author?.date || null;
+  const commitsLast90Days = data.length || 0;
+  const lastCommitDate: string | null = data[0]?.commit?.author?.date || null;
 
   if (data && Array.isArray(data)) {
     for (const commit of data) {
@@ -90,7 +90,7 @@ export async function getContributors(owner: string, repo: string, token: string
 
   // To get an exact total contributor count, we would need to parse Link headers.
   // We'll estimate or just use the fetched list for now if the header isn't available.
-  const topContributors = data.map((c: any) => ({
+  const topContributors = (data as { login: string; contributions: number }[]).map((c) => ({
     login: c.login,
     contributions: c.contributions,
   }));
@@ -142,7 +142,7 @@ export async function getRepoTree(owner: string, repo: string, defaultBranch: st
 }
 
 export async function getCommitsByDateRange(owner: string, repo: string, since: string, until: string, token: string) {
-  let allCommits: any[] = [];
+  let allCommits: { commit: { author: { date: string }; message: string } }[] = [];
   let page = 1;
   const maxPages = 5; // Limit to 500 commits to avoid API abuse/timeouts
 
@@ -152,7 +152,7 @@ export async function getCommitsByDateRange(owner: string, repo: string, since: 
     if (since) url += `&since=${since}`;
     if (until) url += `&until=${until}`;
 
-    const data = await fetchGitHub(url, token);
+    const data = await fetchGitHub(url, token) as { commit: { author: { date: string }; message: string } }[] | null;
     if (!data || !Array.isArray(data) || data.length === 0) {
       break;
     }

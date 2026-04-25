@@ -14,13 +14,16 @@ export default function TokenModal({ isOpen, onClose, onSave }: TokenModalProps)
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (isOpen) {
-      const storedToken = localStorage.getItem("repolens_github_token");
-      if (storedToken) setToken(storedToken);
-      setIsVisible(true);
-    } else {
-      setIsVisible(false);
-    }
+    const id = setTimeout(() => {
+      if (isOpen) {
+        const storedToken = localStorage.getItem("repolens_github_token");
+        if (storedToken) setToken(storedToken);
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+    }, 0);
+    return () => clearTimeout(id);
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -55,7 +58,7 @@ export default function TokenModal({ isOpen, onClose, onSave }: TokenModalProps)
             <ShieldCheck className="w-5 h-5 text-gh-green shrink-0 mt-0.5" />
             <div className="text-xs text-gh-text-secondary">
               <span className="font-semibold text-white block mb-1">Your token is secure</span>
-              We do not store your token on our servers. It is kept locally in your browser's storage and sent directly to the GitHub API.
+              We do not store your token on our servers. It is kept locally in your browser&apos;s storage and sent directly to the GitHub API.
             </div>
           </div>
 
