@@ -1,9 +1,10 @@
 "use client";
 
-import { Search, GitCompare } from "lucide-react";
-import { useState } from "react";
+import { Search, GitCompare, KeyRound } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import TokenModal from "./TokenModal";
 
 function Github(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -27,7 +28,15 @@ function Github(props: React.SVGProps<SVGSVGElement>) {
 
 export default function Header() {
   const [search, setSearch] = useState("");
+  const [isTokenModalOpen, setIsTokenModalOpen] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("repolens_github_token");
+    if (!token) {
+      setIsTokenModalOpen(true);
+    }
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,28 +46,45 @@ export default function Header() {
   };
 
   return (
-    <header className="flex items-center justify-between gap-4 bg-gh-bg-secondary px-4 py-3 border-b border-gh-border text-gh-text text-sm w-full">
-      <div className="flex items-center gap-6">
-        <div className="flex items-center gap-2 font-semibold hover:text-white cursor-pointer transition-colors" onClick={() => router.push('/')}>
-          <Github className="w-8 h-8" />
-          <span className="text-lg hidden sm:block">Repolens</span>
+    <>
+      <header className="flex items-center justify-between gap-4 bg-gh-bg-secondary px-4 py-3 border-b border-gh-border text-gh-text text-sm w-full">
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2 font-semibold hover:text-white cursor-pointer transition-colors" onClick={() => router.push('/')}>
+            <Github className="w-8 h-8" />
+            <span className="text-lg hidden sm:block">Repolens</span>
+          </div>
+          
+          <Link href="/compare" className="flex items-center gap-2 text-gh-text-secondary hover:text-white transition-colors font-medium">
+            <GitCompare className="w-4 h-4" />
+            <span className="hidden sm:block">Compare</span>
+          </Link>
         </div>
-        
-        <Link href="/compare" className="flex items-center gap-2 text-gh-text-secondary hover:text-white transition-colors font-medium">
-          <GitCompare className="w-4 h-4" />
-          <span className="hidden sm:block">Compare</span>
-        </Link>
-      </div>
-      <form onSubmit={handleSearch} className="flex-1 max-w-md ml-4 relative">
-        <input
-          type="text"
-          placeholder="Search repository (e.g., owner/repo)"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full bg-gh-bg border border-gh-border rounded-md px-3 py-1.5 pl-8 focus:outline-none focus:border-gh-blue focus:ring-1 focus:ring-gh-blue"
-        />
-        <Search className="w-4 h-4 absolute left-2.5 top-2.5 text-gh-text-muted" />
-      </form>
-    </header>
+        <div className="flex flex-1 items-center justify-end gap-4">
+          <form onSubmit={handleSearch} className="flex-1 max-w-md relative">
+            <input
+              type="text"
+              placeholder="Search repository (e.g., owner/repo)"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full bg-gh-bg border border-gh-border rounded-md px-3 py-1.5 pl-8 focus:outline-none focus:border-gh-blue focus:ring-1 focus:ring-gh-blue"
+            />
+            <Search className="w-4 h-4 absolute left-2.5 top-2.5 text-gh-text-muted" />
+          </form>
+          <button 
+            onClick={() => setIsTokenModalOpen(true)}
+            className="p-1.5 text-gh-text-secondary hover:text-white border border-transparent hover:border-gh-border hover:bg-gh-bg rounded-md transition-all"
+            title="Configure GitHub Token"
+          >
+            <KeyRound className="w-5 h-5" />
+          </button>
+        </div>
+      </header>
+      
+      <TokenModal 
+        isOpen={isTokenModalOpen} 
+        onClose={() => setIsTokenModalOpen(false)} 
+        onSave={() => setIsTokenModalOpen(false)} 
+      />
+    </>
   );
 }

@@ -39,10 +39,13 @@ export default function ActivityTab({ analysis }: { analysis: RepoAnalysisData }
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['activity', repoFullName, since, until],
     queryFn: async () => {
+      const token = localStorage.getItem('repolens_github_token') || '';
       let url = `/api/activity?repo=${encodeURIComponent(repoFullName)}`;
       if (since) url += `&since=${since}`;
       if (until) url += `&until=${until}`;
-      const res = await fetch(url);
+      const res = await fetch(url, {
+        headers: { 'x-github-token': token }
+      });
       if (!res.ok) throw new Error('Failed to fetch activity');
       return res.json();
     },

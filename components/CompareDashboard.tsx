@@ -21,7 +21,10 @@ export default function CompareDashboard({ repo1, repo2 }: { repo1: string, repo
       {
         queryKey: ['repoAnalysis', repo1],
         queryFn: async () => {
-          const res = await fetch(`/api/analyze?repo=${encodeURIComponent(repo1)}`);
+          const token = localStorage.getItem('repolens_github_token') || '';
+          const res = await fetch(`/api/analyze?repo=${encodeURIComponent(repo1)}`, {
+            headers: { 'x-github-token': token }
+          });
           if (!res.ok) throw new Error(await res.text());
           return res.json();
         },
@@ -30,7 +33,10 @@ export default function CompareDashboard({ repo1, repo2 }: { repo1: string, repo
       {
         queryKey: ['repoAnalysis', repo2],
         queryFn: async () => {
-          const res = await fetch(`/api/analyze?repo=${encodeURIComponent(repo2)}`);
+          const token = localStorage.getItem('repolens_github_token') || '';
+          const res = await fetch(`/api/analyze?repo=${encodeURIComponent(repo2)}`, {
+            headers: { 'x-github-token': token }
+          });
           if (!res.ok) throw new Error(await res.text());
           return res.json();
         },
@@ -39,7 +45,10 @@ export default function CompareDashboard({ repo1, repo2 }: { repo1: string, repo
       {
         queryKey: ['repoActivity', repo1, since90],
         queryFn: async () => {
-          const res = await fetch(`/api/activity?repo=${encodeURIComponent(repo1)}&since=${since90}`);
+          const token = localStorage.getItem('repolens_github_token') || '';
+          const res = await fetch(`/api/activity?repo=${encodeURIComponent(repo1)}&since=${since90}`, {
+            headers: { 'x-github-token': token }
+          });
           if (!res.ok) throw new Error(await res.text());
           return res.json();
         },
@@ -48,7 +57,10 @@ export default function CompareDashboard({ repo1, repo2 }: { repo1: string, repo
       {
         queryKey: ['repoActivity', repo2, since90],
         queryFn: async () => {
-          const res = await fetch(`/api/activity?repo=${encodeURIComponent(repo2)}&since=${since90}`);
+          const token = localStorage.getItem('repolens_github_token') || '';
+          const res = await fetch(`/api/activity?repo=${encodeURIComponent(repo2)}&since=${since90}`, {
+            headers: { 'x-github-token': token }
+          });
           if (!res.ok) throw new Error(await res.text());
           return res.json();
         },

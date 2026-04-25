@@ -2,27 +2,25 @@ import { RepoMetadata, CommitActivity, ContributorData, LanguageData, RepoStruct
 
 const GITHUB_API_URL = 'https://api.github.com';
 
-function getHeaders() {
-  const token = process.env.GITHUB_TOKEN;
+function getHeaders(token: string) {
   const headers: HeadersInit = {
     'Accept': 'application/vnd.github.v3+json',
     'User-Agent': 'Repolens-App',
   };
-  if (token && token !== 'your_github_personal_access_token_here') {
+  if (token) {
     headers['Authorization'] = `token ${token}`;
   }
   return headers;
 }
 
-async function fetchGitHub(endpoint: string, options: RequestInit = {}) {
+async function fetchGitHub(endpoint: string, token: string, options: RequestInit = {}) {
   const res = await fetch(`${GITHUB_API_URL}${endpoint}`, {
     ...options,
-    headers: { ...getHeaders(), ...options.headers },
-    // Short timeout to avoid blocking Vercel functions (e.g., 5s timeout using AbortController in actual implementation)
-    // For simplicity, fetch doesn't have timeout out of the box, standard Next.js behavior applies.
+    headers: { ...getHeaders(token), ...options.headers },
   });
 
   if (!res.ok) {
+    if (res.status === 401) throw new Error('UNAUTHORIZED');
     if (res.status === 404) throw new Error('REPO_NOT_FOUND');
     if (res.status === 403) throw new Error('RATE_LIMIT');
     const text = await res.text().catch(() => 'No response text');
@@ -35,8 +33,8 @@ async function fetchGitHub(endpoint: string, options: RequestInit = {}) {
   return res.json();
 }
 
-export async function getRepoMetadata(owner: string, repo: string): Promise<RepoMetadata> {
-  const data = await fetchGitHub(`/repos/${owner}/${repo}`);
+export async function getRepoMetadata(owner: string, repo: string, token: string): Promise<RepoMetadata> {
+  const data = await fetchGitHub(`/repos/${owner}/${repo}`, token);
   return {
     name: data.name,
     full_name: data.full_name,
@@ -52,7 +50,7 @@ export async function getRepoMetadata(owner: string, repo: string): Promise<Repo
   };
 }
 
-export async function getCommitActivity(owner: string, repo: string): Promise<CommitActivity> {
+export async function getCommitActivity(owner: string, repo: string, token: string): Promise<CommitActivity> {
   // To avoid fetching thousands of commits, we fetch commits since 90 days ago
   const date90DaysAgo = new Date();
   date90DaysAgo.setDate(date90DaysAgo.getDate() - 90);
@@ -62,7 +60,7 @@ export async function getCommitActivity(owner: string, repo: string): Promise<Co
 
   // We request up to 100 commits (max per page) since 90 days ago
   // Note: Pagination may be needed for highly active repos, but per FRD, max 100 commits.
-  const data = await fetchGitHub(`/repos/${owner}/${repo}/commits?since=${date90DaysAgo.toISOString()}&per_page=100`);
+  const data = await fetchGitHub(`/repos/${owner}/${repo}/commits?since=${date90DaysAgo.toISOString()}&per_page=100`, token);
   
   let commitsLast30Days = 0;
   let commitsLast90Days = data.length || 0;
@@ -84,8 +82,8 @@ export async function getCommitActivity(owner: string, repo: string): Promise<Co
   };
 }
 
-export async function getContributors(owner: string, repo: string): Promise<ContributorData> {
-  const data = await fetchGitHub(`/repos/${owner}/${repo}/contributors?per_page=10`);
+export async function getContributors(owner: string, repo: string, token: string): Promise<ContributorData> {
+  const data = await fetchGitHub(`/repos/${owner}/${repo}/contributors?per_page=10`, token);
   if (!data) {
     return { totalContributors: 0, topContributors: [] };
   }
@@ -105,15 +103,15 @@ export async function getContributors(owner: string, repo: string): Promise<Cont
   };
 }
 
-export async function getLanguages(owner: string, repo: string): Promise<LanguageData> {
-  const data = await fetchGitHub(`/repos/${owner}/${repo}/languages`);
+export async function getLanguages(owner: string, repo: string, token: string): Promise<LanguageData> {
+  const data = await fetchGitHub(`/repos/${owner}/${repo}/languages`, token);
   return data || {};
 }
 
-export async function getRepoTree(owner: string, repo: string, defaultBranch: string): Promise<RepoStructure> {
+export async function getRepoTree(owner: string, repo: string, defaultBranch: string, token: string): Promise<RepoStructure> {
   // Fetch tree recursive up to depth 3 is hard with REST API natively unless we parse it.
   // `recursive=1` gets the whole tree. We can filter it.
-  const data = await fetchGitHub(`/repos/${owner}/${repo}/git/trees/${defaultBranch}?recursive=1`);
+  const data = await fetchGitHub(`/repos/${owner}/${repo}/git/trees/${defaultBranch}?recursive=1`, token);
   
   let hasReadme = false;
   let hasLicense = false;
@@ -143,7 +141,7 @@ export async function getRepoTree(owner: string, repo: string, defaultBranch: st
   };
 }
 
-export async function getCommitsByDateRange(owner: string, repo: string, since: string, until: string) {
+export async function getCommitsByDateRange(owner: string, repo: string, since: string, until: string, token: string) {
   let allCommits: any[] = [];
   let page = 1;
   const maxPages = 5; // Limit to 500 commits to avoid API abuse/timeouts
@@ -154,7 +152,7 @@ export async function getCommitsByDateRange(owner: string, repo: string, since: 
     if (since) url += `&since=${since}`;
     if (until) url += `&until=${until}`;
 
-    const data = await fetchGitHub(url);
+    const data = await fetchGitHub(url, token);
     if (!data || !Array.isArray(data) || data.length === 0) {
       break;
     }

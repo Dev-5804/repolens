@@ -6,6 +6,16 @@ import { RepoAnalysisData, ApiResponse } from '@/lib/types';
 
 export async function GET(req: NextRequest) {
   try {
+    const token = req.headers.get('x-github-token');
+    
+    if (!token) {
+      return NextResponse.json({
+        status: 'error',
+        code: 'MISSING_TOKEN',
+        message: 'A GitHub Personal Access Token is required. Please provide it in the X-GitHub-Token header.'
+      } as ApiResponse, { status: 401 });
+    }
+
     const { searchParams } = new URL(req.url);
     const repoQuery = searchParams.get('repo');
 
@@ -33,8 +43,11 @@ export async function GET(req: NextRequest) {
     // 2. Fetch Metadata
     let metadata;
     try {
-      metadata = await getRepoMetadata(owner, repo);
+      metadata = await getRepoMetadata(owner, repo, token);
     } catch (err: any) {
+      if (err.message === 'UNAUTHORIZED') {
+         return NextResponse.json({ status: 'error', code: 'UNAUTHORIZED', message: 'Invalid or expired GitHub Token' } as ApiResponse, { status: 401 });
+      }
       if (err.message === 'REPO_NOT_FOUND') {
          return NextResponse.json({ status: 'error', code: 'REPO_NOT_FOUND', message: 'Repository does not exist' } as ApiResponse, { status: 404 });
       }
@@ -46,10 +59,10 @@ export async function GET(req: NextRequest) {
 
     // 3. Parallel Fetching for remaining metrics
     const [activity, contributors, languages, structure] = await Promise.all([
-      getCommitActivity(owner, repo),
-      getContributors(owner, repo),
-      getLanguages(owner, repo),
-      getRepoTree(owner, repo, metadata.defaultBranch)
+      getCommitActivity(owner, repo, token),
+      getContributors(owner, repo, token),
+      getLanguages(owner, repo, token),
+      getRepoTree(owner, repo, metadata.defaultBranch, token)
     ]);
 
     // 4. Score Generation

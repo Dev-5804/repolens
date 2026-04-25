@@ -2,6 +2,12 @@ import { NextResponse } from 'next/server';
 import { getCommitsByDateRange } from '@/lib/github';
 
 export async function GET(request: Request) {
+  const token = request.headers.get('x-github-token');
+
+  if (!token) {
+    return NextResponse.json({ status: 'error', code: 'MISSING_TOKEN', message: 'A GitHub Personal Access Token is required.' }, { status: 401 });
+  }
+
   const { searchParams } = new URL(request.url);
   const repo = searchParams.get('repo');
   const since = searchParams.get('since') || '';
@@ -14,9 +20,12 @@ export async function GET(request: Request) {
   const [owner, repoName] = repo.split('/');
 
   try {
-    const data = await getCommitsByDateRange(owner, repoName, since, until);
+    const data = await getCommitsByDateRange(owner, repoName, since, until, token);
     return NextResponse.json({ status: 'success', data });
   } catch (error: any) {
+    if (error.message === 'UNAUTHORIZED') {
+      return NextResponse.json({ status: 'error', code: 'UNAUTHORIZED', message: 'Invalid or expired GitHub Token' }, { status: 401 });
+    }
     if (error.message === 'REPO_NOT_FOUND') {
       return NextResponse.json({ status: 'error', code: 'REPO_NOT_FOUND', message: 'Repository not found' }, { status: 404 });
     }

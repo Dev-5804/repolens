@@ -18,9 +18,24 @@ export default function Dashboard({ repo }: { repo: string }) {
   const { data, isLoading, isError, error } = useQuery<ApiResponse>({
     queryKey: ['repoAnalysis', repo],
     queryFn: async () => {
-      const res = await fetch(`/api/analyze?repo=${encodeURIComponent(repo)}`);
+      const token = localStorage.getItem('repolens_github_token');
+      if (!token) {
+        throw new Error('A GitHub Personal Access Token is required to analyze repositories. Please configure it in the header.');
+      }
+
+      const res = await fetch(`/api/analyze?repo=${encodeURIComponent(repo)}`, {
+        headers: {
+          'x-github-token': token
+        }
+      });
+      
       if (!res.ok) {
-        const errorData = await res.json();
+        const errorData = await res.json().catch(() => ({}));
+        if (res.status === 401) {
+          // You could potentially trigger a global event here to open the modal,
+          // but throwing the error will show the error boundary UI.
+          throw new Error('Your GitHub token is invalid or expired. Please update it in the settings.');
+        }
         throw new Error(errorData.message || 'Failed to fetch analysis');
       }
       return res.json();
