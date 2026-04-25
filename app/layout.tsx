@@ -13,10 +13,27 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://repolens.vercel.app";
+function resolveBaseUrl(): URL {
+  const fallback = "https://repolens.vercel.app";
+  const raw =
+    process.env.NEXT_PUBLIC_BASE_URL?.trim() ||
+    process.env.VERCEL_URL?.trim() ||
+    fallback;
+
+  const normalized = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+
+  try {
+    return new URL(normalized);
+  } catch {
+    return new URL(fallback);
+  }
+}
+
+const METADATA_BASE = resolveBaseUrl();
+const BASE_URL = METADATA_BASE.toString().replace(/\/$/, "");
 
 export const metadata: Metadata = {
-  metadataBase: new URL(BASE_URL),
+  metadataBase: METADATA_BASE,
   title: {
     default: "Repolens — GitHub Repository Analytics",
     template: "%s | Repolens",
