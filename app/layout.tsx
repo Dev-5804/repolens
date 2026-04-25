@@ -13,9 +13,62 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://repolens.vercel.app";
+
 export const metadata: Metadata = {
-  title: "Repolens",
-  description: "Instant, read-only dashboard for public Git repositories",
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: "Repolens — GitHub Repository Analytics",
+    template: "%s | Repolens",
+  },
+  description:
+    "Instant, read-only analytics dashboard for any public GitHub repository. Evaluate health, commit activity, contributors, code quality, and more.",
+  keywords: [
+    "GitHub",
+    "repository analytics",
+    "repo health",
+    "open source",
+    "developer tools",
+    "commit activity",
+    "code quality",
+    "GitHub stats",
+  ],
+  authors: [{ name: "Dev-5804", url: "https://github.com/Dev-5804" }],
+  creator: "Dev-5804",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: BASE_URL,
+    siteName: "Repolens",
+    title: "Repolens — GitHub Repository Analytics",
+    description:
+      "Instant, read-only analytics dashboard for any public GitHub repository. Evaluate health, commit activity, contributors, code quality, and more.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Repolens — GitHub Repository Analytics Dashboard",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Repolens — GitHub Repository Analytics",
+    description:
+      "Instant, read-only analytics dashboard for any public GitHub repository. Evaluate health, commit activity, contributors, code quality, and more.",
+    images: ["/og-image.png"],
+    creator: "@Dev_5804",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+    },
+  },
 };
 
 export default function RootLayout({
