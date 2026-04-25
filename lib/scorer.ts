@@ -42,10 +42,14 @@ function calculateMaintainability(contributors: ContributorData): number {
 }
 
 function calculateReliability(structure: RepoStructure): number {
-  // Binary weighted scoring
+  // Deterministic weighted scoring across test automation and guardrails.
   let score = 0;
-  if (structure.hasTests) score += 60;
-  if (structure.hasCi) score += 40;
+  if (structure.hasTests) score += 45;
+  if (structure.hasCi) score += 25;
+  if (structure.hasLint) score += 10;
+  if (structure.hasTypecheck) score += 10;
+  if (structure.hasDependencyLock) score += 5;
+  if (structure.hasSecurityPolicy) score += 5;
   return score;
 }
 

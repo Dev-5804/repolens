@@ -117,6 +117,10 @@ export async function getRepoTree(owner: string, repo: string, defaultBranch: st
   let hasLicense = false;
   let hasTests = false;
   let hasCi = false;
+  let hasLint = false;
+  let hasTypecheck = false;
+  let hasDependencyLock = false;
+  let hasSecurityPolicy = false;
 
   if (data && data.tree) {
     for (const item of data.tree) {
@@ -125,11 +129,65 @@ export async function getRepoTree(owner: string, repo: string, defaultBranch: st
       
       if (pathLower.includes('readme')) hasReadme = true;
       if (pathLower.includes('license')) hasLicense = true;
-      if (pathLower.includes('test')) hasTests = true; // matches test/, tests/, __tests__
+      if (/(^|\/)(__tests__|test|tests)(\/|$)/.test(pathLower) || /\.test\.[a-z0-9]+$/.test(pathLower) || /\.spec\.[a-z0-9]+$/.test(pathLower)) {
+        hasTests = true;
+      }
       if (pathLower.startsWith('.github/workflows/')) hasCi = true;
 
+      if (
+        pathLower === '.eslintrc' ||
+        pathLower.startsWith('.eslintrc.') ||
+        pathLower === 'eslint.config.js' ||
+        pathLower === 'eslint.config.mjs' ||
+        pathLower === 'eslint.config.cjs'
+      ) {
+        hasLint = true;
+      }
+
+      if (
+        pathLower === 'tsconfig.json' ||
+        pathLower.startsWith('tsconfig.') ||
+        pathLower === 'pyrightconfig.json' ||
+        pathLower === 'mypy.ini'
+      ) {
+        hasTypecheck = true;
+      }
+
+      if (
+        pathLower === 'package-lock.json' ||
+        pathLower === 'pnpm-lock.yaml' ||
+        pathLower === 'yarn.lock' ||
+        pathLower === 'bun.lockb' ||
+        pathLower === 'poetry.lock' ||
+        pathLower === 'pipfile.lock' ||
+        pathLower === 'cargo.lock' ||
+        pathLower === 'go.sum'
+      ) {
+        hasDependencyLock = true;
+      }
+
+      if (
+        pathLower === 'security.md' ||
+        pathLower === '.github/security.md' ||
+        pathLower.startsWith('.github/dependabot') ||
+        pathLower === '.snyk'
+      ) {
+        hasSecurityPolicy = true;
+      }
+
       // Early exit if all found
-      if (hasReadme && hasLicense && hasTests && hasCi) break;
+      if (
+        hasReadme &&
+        hasLicense &&
+        hasTests &&
+        hasCi &&
+        hasLint &&
+        hasTypecheck &&
+        hasDependencyLock &&
+        hasSecurityPolicy
+      ) {
+        break;
+      }
     }
   }
 
@@ -138,6 +196,10 @@ export async function getRepoTree(owner: string, repo: string, defaultBranch: st
     hasLicense,
     hasTests,
     hasCi,
+    hasLint,
+    hasTypecheck,
+    hasDependencyLock,
+    hasSecurityPolicy,
   };
 }
 

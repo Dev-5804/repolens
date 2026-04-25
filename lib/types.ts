@@ -37,6 +37,10 @@ export interface RepoStructure {
   hasLicense: boolean;
   hasTests: boolean;
   hasCi: boolean;
+  hasLint: boolean;
+  hasTypecheck: boolean;
+  hasDependencyLock: boolean;
+  hasSecurityPolicy: boolean;
 }
 
 export interface RepoQualityScores {

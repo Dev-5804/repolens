@@ -86,7 +86,7 @@ export default function ScoreTab({ analysis }: { analysis: RepoAnalysisData }) {
               </div>
               <p className="text-sm text-gh-text-secondary flex items-start gap-2">
                 <Info className="w-4 h-4 text-gh-blue shrink-0 mt-0.5" />
-                Checks for the presence of testing frameworks and CI/CD pipelines, indicating automated quality assurance.
+                Scores deterministic quality signals such as tests, CI/CD workflows, linting, type-checking, lockfiles, and security policy files.
               </p>
             </div>
 
